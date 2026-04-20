@@ -1,17 +1,19 @@
-const flashcardsService = require('../services/flashcards.service');
+const service = require('../services/flashcards.service');
 
-exports.getFlashcards = async (req, res) => {
-    const data = await flashcardsService.obtenerFlashcards();
+exports.getByUnidad = async (req, res) => {
+  try {
+    const data = await service.getByUnidad(req.params.unidadId);
     res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Error obteniendo flashcards' });
+  }
 };
 
-exports.createFlashcards = async (req, res) => {
-    const { contenido } = req.body;
-
-    const resultado = await flashcardsService.generarFlashcards(contenido);
-
-    res.json({
-        mensaje: 'Flashcards generadas correctamente',
-        resultado
-    });
+exports.create = async (req, res) => {
+  try {
+    const nueva = await service.create(req.body);
+    res.status(201).json(nueva);
+  } catch (error) {
+    res.status(500).json({ error: 'Error creando flashcard' });
+  }
 };

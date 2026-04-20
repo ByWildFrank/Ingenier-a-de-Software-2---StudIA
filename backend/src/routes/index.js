@@ -7,4 +7,7 @@ router.use('/apuntes', require('./apuntes.routes'));
 router.use('/flashcards', require('./flashcards.routes'));
 router.use('/respuestas', require('./respuestas.routes'));
 
+router.use('/auth', require('./auth.routes'));
+
+
 module.exports = router;
