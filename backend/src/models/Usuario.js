@@ -1,10 +1,10 @@
 class Usuario {
   constructor({ id_usuario, nombre, correo, nivel_educativo, id_tipo_usuario }) {
-    this.id = id_usuario;
+    this.id_usuario = id_usuario;
     this.nombre = nombre;
     this.correo = correo;
-    this.nivelEducativo = nivel_educativo;
-    this.tipoUsuario = id_tipo_usuario;
+    this.nivel_educativo = nivel_educativo;
+    this.id_tipo_usuario = id_tipo_usuario;
   }
 
   static fromDB(row) {

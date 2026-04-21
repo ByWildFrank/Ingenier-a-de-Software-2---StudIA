@@ -1,7 +1,7 @@
 const sql = require('mssql');
 
 const config = {
-    user: 'node_user',
+    user: 'studia_user',
     password: '1234',
     server: 'localhost',
     database: 'StudIA',
