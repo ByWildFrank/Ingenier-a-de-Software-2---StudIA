@@ -25,13 +25,22 @@
           No hay flashcards generadas para esta materia. 
           <router-link to="/flashcards" class="link-crear">¡Creá algunas primero!</router-link>
         </p>
-        <button 
-          class="action-btn start-btn mt-3" 
-          @click="iniciarEstudio" 
-          :disabled="!flashcards.length"
-        >
-          <i class='bx bx-play'></i> Comenzar Estudio
-        </button>
+        <div class="selector-actions">
+          <button 
+            class="action-btn start-btn mt-3" 
+            @click="iniciarEstudio" 
+            :disabled="!flashcards.length"
+          >
+            <i class='bx bx-play'></i> Comenzar Estudio
+          </button>
+          <button 
+            class="action-btn outline-btn mt-3" 
+            @click="verBiblioteca = true" 
+            :disabled="!flashcards.length"
+          >
+            <i class='bx bx-list-check'></i> Ver todas las respuestas
+          </button>
+        </div>
       </div>
 
       <div v-if="loading" class="mt-4 text-center">
@@ -102,6 +111,39 @@
           <button class="action-btn mt-3" @click="siguientePregunta">
             {{ isLastQuestion ? 'Ver Resultados' : 'Siguiente Tarjeta →' }}
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado: Biblioteca (Ver todas las respuestas) -->
+    <div v-if="verBiblioteca" class="library-container">
+      <div class="library-header card-glass mb-4">
+        <div class="header-content">
+          <h1>📖 Biblioteca de Respuestas</h1>
+          <p class="materia-name">{{ selectedMateriaName }}</p>
+        </div>
+        <button class="action-btn outline-btn" @click="verBiblioteca = false">
+          <i class='bx bx-arrow-back'></i> Volver
+        </button>
+      </div>
+
+      <div class="library-grid">
+        <div v-for="(fc, idx) in flashcards" :key="fc.id_flashcard" class="library-card card-glass">
+          <div class="card-num">#{{ idx + 1 }}</div>
+          <p class="card-titulo-sm" v-if="fc.titulo">{{ fc.titulo }}</p>
+          <h3 class="card-question">{{ fc.pregunta }}</h3>
+          <div class="correct-answer-box mt-3">
+            <span class="label">Respuesta correcta:</span>
+            <p class="answer-text-active">{{ fc.respuestas.find(r => r.es_correcta)?.texto_respuesta }}</p>
+          </div>
+          <div class="distractors mt-2">
+            <span class="label-sm">Distractores:</span>
+            <ul class="distractors-list">
+              <li v-for="(r, ri) in fc.respuestas.filter(r => !r.es_correcta)" :key="ri">
+                {{ r.texto_respuesta }}
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -180,6 +222,7 @@ export default {
       
       // Estado de estudio
       modoEstudio: false,
+      verBiblioteca: false,
       resumenFinal: false,
       currentIndex: 0,
       selectedAnswer: null,
@@ -226,6 +269,13 @@ export default {
     }
     await this.loadMaterias();
     
+    // Si viene un id_materia en la URL, cargar esa materia directamente
+    const materiaId = this.$route.query.id_materia;
+    if (materiaId) {
+      this.selectedMateriaId = parseInt(materiaId);
+      this.modoEstudio = true; // Iniciar directamente
+    }
+
     // Si viene un id_apunte en la URL, cargar ese estudio directamente
     const apunteId = this.$route.query.id_apunte;
     if (apunteId) {
@@ -540,4 +590,59 @@ export default {
   60% { transform: translateX(-4px); }
   80% { transform: translateX(4px); }
 }
+
+/* Biblioteca Styles */
+.library-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease;
+}
+
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+}
+
+.library-header h1 { font-size: 24px; margin-bottom: 4px; }
+.library-header .materia-name { color: var(--primary-color); font-weight: 600; }
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+.library-card {
+  position: relative;
+  padding: 30px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.card-num {
+  position: absolute;
+  top: 15px; right: 20px;
+  font-size: 14px; color: var(--text-muted); font-weight: 700;
+}
+
+.card-titulo-sm { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+.card-question { font-size: 18px; line-height: 1.4; color: var(--text-main); }
+
+.correct-answer-box {
+  background: rgba(16, 185, 129, 0.1);
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.correct-answer-box .label { font-size: 11px; text-transform: uppercase; color: #10b981; font-weight: 700; display: block; margin-bottom: 4px; }
+.answer-text-active { color: white; font-weight: 600; font-size: 15px; }
+
+.distractors .label-sm { font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px; }
+.distractors-list { list-style: none; padding: 0; }
+.distractors-list li { font-size: 13px; color: var(--text-muted); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+/* Selector layout */
+.selector-actions { display: flex; gap: 12px; justify-content: center; }
 </style>

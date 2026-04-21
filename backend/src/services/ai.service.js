@@ -17,8 +17,9 @@ const GEMINI_SUPPORTED_MIMES = {
 
 // Prompt para generar flashcards
 const FLASHCARD_PROMPT = `Eres un asistente de estudio experto. Analiza el contenido proporcionado y crea una lista de flashcards (tarjetas de estudio).
-Extrae la información más importante. Para cada concepto genera un título corto descriptivo, una pregunta, su nivel de dificultad del 1 al 5 y exactamente 4 posibles respuestas donde sólo una sea la correcta.
-La salida COMPLETA debe ser un arreglo estricto JSON:
+Extrae la información más importante. Genera entre 8 y 12 flashcards de alta calidad.
+Para cada concepto genera un título corto descriptivo, una pregunta, su nivel de dificultad del 1 al 5 y exactamente 4 posibles respuestas donde sólo una sea la correcta.
+La salida DEBE SER ÚNICAMENTE un arreglo JSON válido siguiendo exactamente esta estructura:
 [
   {
     "titulo": "Arquitectura Cliente-Servidor",
@@ -128,13 +129,24 @@ exports.generateFlashcardsFromFile = async (filePath, mimeType, displayName) => 
   const result = await model.generateContent(contentParts);
 
   const outputText = result.response.text();
-  console.log("Respuesta recibida desde Gemini.");
+  console.log(`Respuesta recibida desde Gemini (${outputText.length} caracteres).`);
   
-  // Extract JSON payload safely from Markdown if generated
+  // Limpieza robusta de JSON (extrae lo que haya entre los primeros [ y últimos ])
   let jsonStr = outputText.trim();
-  if (jsonStr.startsWith('```json')) {
-    jsonStr = jsonStr.substring(7, jsonStr.length - 3).trim();
+  const start = jsonStr.indexOf('[');
+  const end = jsonStr.lastIndexOf(']');
+  
+  if (start !== -1 && end !== -1) {
+    jsonStr = jsonStr.substring(start, end + 1);
+  } else {
+    // Si no hay brackets, intentamos limpiar markdown básico
+    jsonStr = jsonStr.replace(/```json|```/g, '').trim();
   }
   
-  return JSON.parse(jsonStr);
+  try {
+    return JSON.parse(jsonStr);
+  } catch (e) {
+    console.error("Error parseando JSON de Gemini. Fragmento final:", jsonStr.slice(-50));
+    throw new Error("La IA generó un formato de datos inválido. Por favor, intenta de nuevo.");
+  }
 };

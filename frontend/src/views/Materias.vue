@@ -170,7 +170,7 @@
           <router-link :to="'/flashcards'" class="action-btn small-btn">
             <i class='bx bx-plus-circle'></i> Nuevo apunte
           </router-link>
-          <router-link :to="'/examen'" class="action-btn small-btn outline-btn">
+          <router-link :to="{ path: '/examen', query: { id_materia: m.id_materia } }" class="action-btn small-btn outline-btn">
             <i class='bx bx-brain'></i> Repasar todo
           </router-link>
         </div>

@@ -8,12 +8,7 @@ exports.getByApunte = async (id_apunte) => {
   const pool = await getConnection();
   const result = await pool.request()
     .input('id_apunte', id_apunte)
-    .query(`
-      SELECT f.id_flashcard, f.id_apunte, a.id_materia, f.titulo, f.pregunta, f.dificultad, f.activo
-      FROM Flashcard f
-      INNER JOIN Apunte a ON f.id_apunte = a.id_apunte
-      WHERE f.id_apunte = @id_apunte AND f.activo = 1
-    `);
+    .execute('sp_Flashcard_ObtenerPorApunte');
   
   const flashcards = result.recordset;
   return await loadAnswersForFlashcards(pool, flashcards);
@@ -24,11 +19,7 @@ async function loadAnswersForFlashcards(pool, flashcards) {
   for (const fc of flashcards) {
     const respResult = await pool.request()
       .input('id_flashcard', fc.id_flashcard)
-      .query(`
-        SELECT id_respuesta, texto_respuesta, es_correcta
-        FROM Respuesta
-        WHERE id_flashcard = @id_flashcard AND activo = 1
-      `);
+      .execute('sp_Respuesta_ObtenerPorFlashcard');
     fc.respuestas = respResult.recordset;
   }
   return flashcards;
@@ -38,12 +29,7 @@ exports.getByMateriaWithAnswers = async (id_materia) => {
   const pool = await getConnection();
   const fcResult = await pool.request()
     .input('id_materia', id_materia)
-    .query(`
-      SELECT f.id_flashcard, f.id_apunte, f.titulo, f.pregunta, f.dificultad
-      FROM Flashcard f
-      INNER JOIN Apunte a ON f.id_apunte = a.id_apunte
-      WHERE a.id_materia = @id_materia AND f.activa = 1 AND a.activo = 1
-    `);
+    .execute('sp_Flashcard_ObtenerPorMateria');
 
   const flashcards = fcResult.recordset;
   return await loadAnswersForFlashcards(pool, flashcards);

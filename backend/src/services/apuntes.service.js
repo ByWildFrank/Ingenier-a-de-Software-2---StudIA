@@ -4,13 +4,7 @@ exports.getByMateria = async (materiaId) => {
   const pool = await getConnection();
   const result = await pool.request()
     .input('id_materia', materiaId)
-    .query(`
-      SELECT 
-        a.id_apunte, a.id_materia, a.titulo, a.ruta_archivo, a.tipo_archivo, a.tamaño_bytes, a.fecha_creacion,
-        (SELECT COUNT(*) FROM Flashcard f WHERE f.id_apunte = a.id_apunte AND f.activa = 1) as cantFlashcards
-      FROM Apunte a
-      WHERE a.id_materia = @id_materia AND a.activo = 1
-    `);
+    .execute('sp_Apunte_ObtenerPorMateria');
   return result.recordset;
 };
 
