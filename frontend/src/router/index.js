@@ -9,7 +9,8 @@ const routes = [
   { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } },
   { path: '/materias', component: () => import('../views/Materias.vue'), meta: { requiresAuth: true } },
   { path: '/flashcards', component: () => import('../views/FlashcardsIA.vue'), meta: { requiresAuth: true } },
-  { path: '/examen', component: () => import('../views/ExamenFlashcards.vue'), meta: { requiresAuth: true } }
+  { path: '/examen', component: () => import('../views/ExamenFlashcards.vue'), meta: { requiresAuth: true } },
+  { path: '/crear-examen', component: () => import('../views/GenerarExamen.vue'), meta: { requiresAuth: true } }
 ];
 
 const router = createRouter({

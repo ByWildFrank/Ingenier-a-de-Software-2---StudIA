@@ -33,6 +33,12 @@
         </router-link>
       </li>
       <li>
+        <router-link to="/crear-examen" active-class="active">
+          <i class='bx bx-edit-alt'></i>
+          <span class="link-name">Crear Examen</span>
+        </router-link>
+      </li>
+      <li>
         <router-link to="/pomodoro" active-class="active">
           <i class='bx bx-timer'></i>
           <span class="link-name">Pomodoro</span>
