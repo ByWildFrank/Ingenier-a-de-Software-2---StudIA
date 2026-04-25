@@ -53,7 +53,7 @@
         <div class="upload-box" @click="$refs.fileInput.click()">
           <i class='bx bx-cloud-upload upload-icon'></i>
           <p class="mt-2">Haz clic para seleccionar tu Apunte</p>
-          <span class="file-types">Soporta: .pdf, .docx, .ppt, imágenes, .txt</span>
+          <span class="file-types">Soporta: .pdf, .docx, .ppt, .pptx, .doc</span>
           <input 
             type="file" 
             ref="fileInput" 
@@ -203,7 +203,32 @@ export default {
       } catch (e) { alert("Error creando materia."); }
     },
     manejarArchivo(event) {
-      if (event.target.files.length > 0) this.archivoSeleccionado = event.target.files[0];
+      if (event.target.files.length > 0) {
+        const file = event.target.files[0];
+        if (this.validarArchivo(file)) {
+          this.archivoSeleccionado = file;
+        } else {
+          event.target.value = ''; // Limpiar el input
+          this.archivoSeleccionado = null;
+        }
+      }
+    },
+    validarArchivo(file) {
+      const MAX_SIZE = 15 * 1024 * 1024; // 15MB
+      const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx'];
+      const extension = file.name.split('.').pop().toLowerCase();
+
+      if (!ALLOWED_EXTENSIONS.includes(extension)) {
+        alert("Formato no permitido. Solo se aceptan PDF, Word (doc, docx) o PowerPoint (ppt, pptx).");
+        return false;
+      }
+
+      if (file.size > MAX_SIZE) {
+        alert("El archivo es demasiado grande. El máximo permitido es 15MB.");
+        return false;
+      }
+
+      return true;
     },
     async subirApunte() {
       if (!this.archivoSeleccionado || !this.idMateriaSeleccionada) return;

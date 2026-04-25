@@ -29,7 +29,7 @@
         </div>
 
         <div class="form-group">
-          <label>Documento de Origen (PDF)</label>
+          <label>Documento de Origen (PDF, Word, PPT)</label>
           <div class="drop-zone" :class="{ 'dragging': isDragging }" 
                @dragover.prevent="isDragging = true" 
                @dragleave="isDragging = false"
@@ -158,11 +158,38 @@ export default {
     handleDrop(e) {
       this.isDragging = false;
       const file = e.dataTransfer.files[0];
-      if (file) this.fileName = file.name;
+      if (file) {
+        if (this.validarArchivo(file)) {
+          this.fileName = file.name;
+        }
+      }
     },
     handleFileChange(e) {
       const file = e.target.files[0];
-      if (file) this.fileName = file.name;
+      if (file) {
+        if (this.validarArchivo(file)) {
+          this.fileName = file.name;
+        } else {
+          e.target.value = ''; // Limpiar el input si falla
+        }
+      }
+    },
+    validarArchivo(file) {
+      const MAX_SIZE = 15 * 1024 * 1024; // 15MB
+      const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx'];
+      const extension = file.name.split('.').pop().toLowerCase();
+
+      if (!ALLOWED_EXTENSIONS.includes(extension)) {
+        alert("Formato no permitido. Solo se aceptan PDF, Word (doc, docx) o PowerPoint (ppt, pptx).");
+        return false;
+      }
+
+      if (file.size > MAX_SIZE) {
+        alert("El archivo es demasiado grande. El máximo permitido es 15MB.");
+        return false;
+      }
+
+      return true;
     },
     generarExamen() {
       if (!this.fileName) {
