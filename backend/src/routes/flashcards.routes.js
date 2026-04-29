@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/flashcards.controller');
 
-router.get('/apunte/:apunteId', controller.getByApunte);
-router.get('/materia/:materiaId', controller.getByMateria);
-router.post('/generate', controller.generate);
-router.post('/progress', controller.saveProgress);
+router.get('/apunte/:apunteId', controller.obtenerPorApunte);
+router.get('/materia/:materiaId', controller.obtenerPorMateria);
+router.post('/generate', controller.generar);
+router.post('/progress', controller.guardarProgreso);
 
 module.exports = router;

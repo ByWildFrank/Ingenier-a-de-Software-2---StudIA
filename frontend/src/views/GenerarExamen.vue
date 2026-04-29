@@ -33,11 +33,11 @@
           <div class="drop-zone" :class="{ 'dragging': isDragging }" 
                @dragover.prevent="isDragging = true" 
                @dragleave="isDragging = false"
-               @drop.prevent="handleDrop">
+               @drop.prevent="manejarArrastre">
             <i class='bx bx-cloud-upload'></i>
             <p v-if="!fileName">Arrastra aquí tu examen o haz clic para subir</p>
             <p v-else class="file-uploaded text-gradient">{{ fileName }}</p>
-            <input type="file" ref="fileInput" hidden @change="handleFileChange">
+            <input type="file" ref="fileInput" hidden @change="manejarCambioArchivo">
             <button class="small-btn" @click="$refs.fileInput.click()">Explorar Archivos</button>
           </div>
         </div>
@@ -155,7 +155,7 @@ export default {
     }
   },
   methods: {
-    handleDrop(e) {
+    manejarArrastre(e) {
       this.isDragging = false;
       const file = e.dataTransfer.files[0];
       if (file) {
@@ -164,7 +164,7 @@ export default {
         }
       }
     },
-    handleFileChange(e) {
+    manejarCambioArchivo(e) {
       const file = e.target.files[0];
       if (file) {
         if (this.validarArchivo(file)) {

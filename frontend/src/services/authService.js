@@ -3,7 +3,7 @@ import axios from 'axios';
 const API_URL = 'http://localhost:3000/api/auth';
 
 export default {
-  async login(correo, contraseña) {
+  async iniciarSesion(correo, contraseña) {
     try {
       const res = await axios.post(`${API_URL}/login`, {
         correo,
@@ -17,7 +17,7 @@ export default {
     }
   },
   
-  async register(nombre, correo, contraseña, nivel_educativo) {
+  async registrar(nombre, correo, contraseña, nivel_educativo) {
     try {
       const res = await axios.post(`${API_URL}/register`, {
         nombre,

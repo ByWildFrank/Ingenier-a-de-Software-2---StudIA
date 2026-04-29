@@ -10,7 +10,7 @@ class Apunte {
     this.activo = activo;
   }
 
-  static fromDB(row) {
+  static desdeDB(row) {
     return new Apunte(row);
   }
 
@@ -27,7 +27,7 @@ class Apunte {
     };
   }
 
-  static validate(data) {
+  static validar(data) {
     if (!data.id_materia) throw new Error("El apunte debe pertenecer a una materia");
     if (!data.titulo) throw new Error("El título del apunte es obligatorio");
     if (!data.ruta_archivo) throw new Error("La ruta del archivo es obligatoria");

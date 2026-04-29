@@ -9,7 +9,7 @@ class Flashcard {
     this.titulo = titulo?.trim() || '';
   }
 
-  static fromDB(row) {
+  static desdeDB(row) {
     return new Flashcard(row);
   }
 
@@ -25,7 +25,7 @@ class Flashcard {
     };
   }
 
-  static validate(data) {
+  static validar(data) {
     if (!data.id_apunte) throw new Error("La flashcard debe pertenecer a un apunte");
     if (!data.pregunta) throw new Error("La pregunta es obligatoria");
     if (data.dificultad !== null && data.dificultad !== undefined) {

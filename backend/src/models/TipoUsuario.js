@@ -5,7 +5,7 @@ class TipoUsuario {
     this.activo = activo;
   }
 
-  static fromDB(row) {
+  static desdeDB(row) {
     return new TipoUsuario(row);
   }
 

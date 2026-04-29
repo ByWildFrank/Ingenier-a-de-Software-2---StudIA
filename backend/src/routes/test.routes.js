@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { getConnection } = require('../database/db');
+const { obtenerConexion } = require('../database/db');
 
 router.get('/', async (req, res) => {
     try {
-        const pool = await getConnection();
+        const pool = await obtenerConexion();
         const result = await pool.request().query('SELECT 1 AS conectado');
         res.json(result.recordset);
     } catch (error) {

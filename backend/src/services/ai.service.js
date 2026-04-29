@@ -38,7 +38,7 @@ La salida DEBE SER ÚNICAMENTE un arreglo JSON válido siguiendo exactamente est
  * Extrae texto de archivos .docx y .pptx que Gemini no soporta directamente.
  * @returns {string|null} El texto extraído, o null si el formato es nativo de Gemini.
  */
-async function extractTextIfNeeded(filePath) {
+async function extraerTextoSiEsNecesario(filePath) {
   const ext = path.extname(filePath).toLowerCase();
 
   if (ext === '.docx' || ext === '.doc') {
@@ -75,7 +75,7 @@ async function extractTextIfNeeded(filePath) {
   return null; // Gemini puede procesar el archivo directamente
 }
 
-exports.generateFlashcardsFromFile = async (filePath, mimeType, displayName) => {
+exports.generarFlashcardsDesdeArchivo = async (filePath, mimeType, displayName) => {
   if (!process.env.GEMINI_API_KEY) {
     throw new Error("Missing GEMINI_API_KEY in .env");
   }
@@ -91,7 +91,7 @@ exports.generateFlashcardsFromFile = async (filePath, mimeType, displayName) => 
   });
 
   // Decidir estrategia: subir archivo o enviar texto extraído
-  const extractedText = await extractTextIfNeeded(filePath);
+  const extractedText = await extraerTextoSiEsNecesario(filePath);
   let contentParts;
 
   if (extractedText) {

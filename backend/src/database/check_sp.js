@@ -1,8 +1,8 @@
-const { getConnection } = require('./db');
+const { obtenerConexion } = require('./db');
 
-async function getStoredProcedures() {
+async function obtenerProcedimientosAlmacenados() {
     try {
-        const pool = await getConnection();
+        const pool = await obtenerConexion();
         const result = await pool.request().query(`
             SELECT name 
             FROM sys.procedures
@@ -16,4 +16,4 @@ async function getStoredProcedures() {
     }
 }
 
-getStoredProcedures();
+obtenerProcedimientosAlmacenados();

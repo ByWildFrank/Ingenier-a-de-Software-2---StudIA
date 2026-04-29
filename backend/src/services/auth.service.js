@@ -1,8 +1,8 @@
-const { getConnection } = require('../database/db');
+const { obtenerConexion } = require('../database/db');
 const Usuario = require('../models/Usuario');
 
-exports.login = async (correo, contraseña) => {
-  const pool = await getConnection();
+exports.iniciarSesion = async (correo, contraseña) => {
+  const pool = await obtenerConexion();
 
   const result = await pool.request()
     .input('correo', correo)
@@ -11,11 +11,11 @@ exports.login = async (correo, contraseña) => {
 
   if (result.recordset.length === 0) return null;
 
-  return Usuario.fromDB(result.recordset[0]);
+  return Usuario.desdeDB(result.recordset[0]);
 };
 
-exports.register = async (nombre, correo, contraseña, nivelEducativo) => {
-  const pool = await getConnection();
+exports.registrar = async (nombre, correo, contraseña, nivelEducativo) => {
+  const pool = await obtenerConexion();
 
   // Asumiremos que tenemos un procedimiento almacenado sp_Usuario_Register o haremos un INSERT directo
   // Haremos un INSERT directo seguro por ahora que devuelva al usuario insertado.

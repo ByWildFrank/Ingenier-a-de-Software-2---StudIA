@@ -1,21 +1,21 @@
-const { getConnection } = require('../database/db');
+const { obtenerConexion } = require('../database/db');
 const sql = require('mssql');
 const aiService = require('./ai.service');
 const apuntesService = require('./apuntes.service');
 const path = require('path');
 
-exports.getByApunte = async (id_apunte) => {
-  const pool = await getConnection();
+exports.obtenerPorApunte = async (id_apunte) => {
+  const pool = await obtenerConexion();
   const result = await pool.request()
     .input('id_apunte', id_apunte)
     .execute('sp_Flashcard_ObtenerPorApunte');
   
   const flashcards = result.recordset;
-  return await loadAnswersForFlashcards(pool, flashcards);
+  return await cargarRespuestasParaFlashcards(pool, flashcards);
 };
 
 // Función auxiliar para cargar respuestas de una lista de flashcards
-async function loadAnswersForFlashcards(pool, flashcards) {
+async function cargarRespuestasParaFlashcards(pool, flashcards) {
   for (const fc of flashcards) {
     const respResult = await pool.request()
       .input('id_flashcard', fc.id_flashcard)
@@ -25,18 +25,18 @@ async function loadAnswersForFlashcards(pool, flashcards) {
   return flashcards;
 }
 
-exports.getByMateriaWithAnswers = async (id_materia) => {
-  const pool = await getConnection();
+exports.obtenerPorMateriaConRespuestas = async (id_materia) => {
+  const pool = await obtenerConexion();
   const fcResult = await pool.request()
     .input('id_materia', id_materia)
     .execute('sp_Flashcard_ObtenerPorMateria');
 
   const flashcards = fcResult.recordset;
-  return await loadAnswersForFlashcards(pool, flashcards);
+  return await cargarRespuestasParaFlashcards(pool, flashcards);
 };
 
-exports.saveProgress = async (data) => {
-  const pool = await getConnection();
+exports.guardarProgreso = async (data) => {
+  const pool = await obtenerConexion();
   const result = await pool.request()
     .input('id_usuario', data.id_usuario)
     .input('id_materia', data.id_materia)
@@ -47,22 +47,22 @@ exports.saveProgress = async (data) => {
   return { id_progreso: Object.values(result.recordset[0])[0], ...data };
 };
 
-exports.generateAndSave = async (id_apunte) => {
+exports.generarYGuardar = async (id_apunte) => {
   // 1. Obtener la metadata del Apunte
-  const apunte = await apuntesService.getById(id_apunte);
+  const apunte = await apuntesService.obtenerPorId(id_apunte);
   if (!apunte) throw new Error("Apunte no encontrado");
 
   // 2. Resolver la ruta física
   const filePath = path.join(__dirname, '../../uploads', apunte.ruta_archivo);
 
   // 3. Obtener Flashcards desde Gemini AI
-  const flashcardsJson = await aiService.generateFlashcardsFromFile(
+  const flashcardsJson = await aiService.generarFlashcardsDesdeArchivo(
     filePath, 
     apunte.tipo_archivo, 
     apunte.titulo
   );
 
-  const pool = await getConnection();
+  const pool = await obtenerConexion();
   const resultados = [];
 
   // 4. Guardar en Base de Datos usando Transaction para masividad

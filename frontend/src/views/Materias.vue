@@ -66,7 +66,7 @@
         
         <!-- Header de la materia -->
         <div class="materia-header" @click="toggleMateria(m.id_materia)">
-          <div class="materia-icon" :style="{ background: getGradient(m.id_materia) }">
+          <div class="materia-icon" :style="{ background: obtenerDegradado(m.id_materia) }">
             <i class='bx bx-book-bookmark'></i>
           </div>
           <div class="materia-info">
@@ -299,7 +299,7 @@ export default {
       this.mostrarFormulario = false;
       this.nuevaMateria = { nombre: '', descripcion: '' };
     },
-    getGradient(id) {
+    obtenerDegradado(id) {
       const gradients = [
         'linear-gradient(135deg, #3b82f6, #2563eb)',
         'linear-gradient(135deg, #8b5cf6, #7c3aed)',

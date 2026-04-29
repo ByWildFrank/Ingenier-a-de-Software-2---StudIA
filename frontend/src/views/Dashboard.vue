@@ -167,10 +167,10 @@ export default {
       this.$router.push('/login');
       return;
     }
-    await this.loadStats();
+    await this.cargarEstadisticas();
   },
   methods: {
-    async loadStats() {
+    async cargarEstadisticas() {
       this.loading = true;
       try {
         const id = this.usuario?.id_usuario || 1;

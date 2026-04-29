@@ -1,7 +1,7 @@
-const { getConnection } = require('../database/db');
+const { obtenerConexion } = require('../database/db');
 
-exports.getByFlashcard = async (flashcardId) => {
-  const pool = await getConnection();
+exports.obtenerPorFlashcard = async (flashcardId) => {
+  const pool = await obtenerConexion();
   const result = await pool.request()
     .input('flashcardId', flashcardId)
     .query(`
@@ -13,8 +13,8 @@ exports.getByFlashcard = async (flashcardId) => {
   return result.recordset;
 };
 
-exports.create = async (data) => {
-  const pool = await getConnection();
+exports.crear = async (data) => {
+  const pool = await obtenerConexion();
   const result = await pool.request()
     .input('flashcardId', data.flashcardId)
     .input('texto', data.texto)

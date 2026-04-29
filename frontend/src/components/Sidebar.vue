@@ -56,7 +56,7 @@
           <span class="role">Estudiante</span>
         </div>
       </div>
-      <button class="logout-btn" @click="logout" title="Cerrar sesión">
+      <button class="logout-btn" @click="cerrarSesion" title="Cerrar sesión">
         <i class='bx bx-log-out'></i>
       </button>
     </div>
@@ -78,7 +78,7 @@ export default {
     }
   },
   methods: {
-    logout() {
+    cerrarSesion() {
       localStorage.removeItem('usuario');
       this.$router.push('/login');
     }

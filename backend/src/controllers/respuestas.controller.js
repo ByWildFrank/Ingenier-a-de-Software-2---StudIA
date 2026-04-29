@@ -1,17 +1,17 @@
 const service = require('../services/respuestas.service');
 
-exports.getByFlashcard = async (req, res) => {
+exports.obtenerPorFlashcard = async (req, res) => {
   try {
-    const data = await service.getByFlashcard(req.params.flashcardId);
+    const data = await service.obtenerPorFlashcard(req.params.flashcardId);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Error obteniendo respuestas' });
   }
 };
 
-exports.create = async (req, res) => {
+exports.crear = async (req, res) => {
   try {
-    const nueva = await service.create(req.body);
+    const nueva = await service.crear(req.body);
     res.status(201).json(nueva);
   } catch (error) {
     res.status(500).json({ error: 'Error creando respuesta' });

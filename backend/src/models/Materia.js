@@ -7,7 +7,7 @@ class Materia {
     this.activo = activo;
   }
 
-  static fromDB(row) {
+  static desdeDB(row) {
     return new Materia(row);
   }
 
@@ -21,7 +21,7 @@ class Materia {
     };
   }
 
-  static validate(data) {
+  static validar(data) {
     if (!data.id_usuario) throw new Error("La materia debe pertenecer a un usuario");
     if (!data.nombre_materia) throw new Error("El nombre de la materia es obligatorio");
   }

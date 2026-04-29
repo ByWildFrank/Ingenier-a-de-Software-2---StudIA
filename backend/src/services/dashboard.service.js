@@ -1,7 +1,7 @@
-const { getConnection } = require('../database/db');
+const { obtenerConexion } = require('../database/db');
 
-exports.getStats = async (id_usuario) => {
-  const pool = await getConnection();
+exports.obtenerEstadisticas = async (id_usuario) => {
+  const pool = await obtenerConexion();
 
   const result = await pool.request()
     .input('id_usuario', id_usuario)

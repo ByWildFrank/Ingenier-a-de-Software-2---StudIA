@@ -1,23 +1,23 @@
-const { getConnection } = require('../database/db');
+const { obtenerConexion } = require('../database/db');
 
-exports.getByMateria = async (materiaId) => {
-  const pool = await getConnection();
+exports.obtenerPorMateria = async (materiaId) => {
+  const pool = await obtenerConexion();
   const result = await pool.request()
     .input('id_materia', materiaId)
     .execute('sp_Apunte_ObtenerPorMateria');
   return result.recordset;
 };
 
-exports.getById = async (id_apunte) => {
-  const pool = await getConnection();
+exports.obtenerPorId = async (id_apunte) => {
+  const pool = await obtenerConexion();
   const result = await pool.request()
     .input('id_apunte', id_apunte)
     .execute('sp_Apunte_ObtenerPorID');
   return result.recordset[0];
 };
 
-exports.create = async (data) => {
-  const pool = await getConnection();
+exports.crear = async (data) => {
+  const pool = await obtenerConexion();
   const result = await pool.request()
     .input('id_materia', data.id_materia)
     .input('titulo', data.titulo)

@@ -3,7 +3,7 @@
     <div class="login-card">
       <h2>Iniciar Sesión</h2>
 
-      <form @submit.prevent="login">
+      <form @submit.prevent="iniciarSesion">
         <div class="form-group">
           <label>Correo</label>
           <input v-model="correo" type="email" required />
@@ -39,11 +39,11 @@ export default {
     };
   },
   methods: {
-    async login() {
+    async iniciarSesion() {
       this.error = null;
 
       try {
-        const usuario = await authService.login(this.correo, this.contraseña);
+        const usuario = await authService.iniciarSesion(this.correo, this.contraseña);
 
         localStorage.setItem('usuario', JSON.stringify(usuario));
 

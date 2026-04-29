@@ -259,7 +259,7 @@ export default {
   watch: {
     async selectedMateriaId(id) {
       if (!id) return;
-      await this.loadFlashcards(id);
+      await this.cargarFlashcards(id);
     }
   },
   async mounted() {
@@ -267,7 +267,7 @@ export default {
     if (userStr) {
       this.usuario = JSON.parse(userStr);
     }
-    await this.loadMaterias();
+    await this.cargarMaterias();
     
     // Si viene un id_materia en la URL, cargar esa materia directamente
     const materiaId = this.$route.query.id_materia;
@@ -279,11 +279,11 @@ export default {
     // Si viene un id_apunte en la URL, cargar ese estudio directamente
     const apunteId = this.$route.query.id_apunte;
     if (apunteId) {
-      await this.loadFlashcardsByApunte(apunteId);
+      await this.cargarFlashcardsPorApunte(apunteId);
     }
   },
   methods: {
-    async loadMaterias() {
+    async cargarMaterias() {
       try {
         const id = this.usuario?.id_usuario;
         if (!id) return;
@@ -293,22 +293,22 @@ export default {
         console.error(e);
       }
     },
-    async loadFlashcards(id) {
+    async cargarFlashcards(id) {
       this.loading = true;
       try {
         const res = await axios.get(`http://localhost:3000/api/flashcards/materia/${id}`);
-        this.flashcards = this.shuffleArray(res.data);
+        this.flashcards = this.mezclarArreglo(res.data);
       } catch (e) {
         console.error(e);
       } finally {
         this.loading = false;
       }
     },
-    async loadFlashcardsByApunte(id) {
+    async cargarFlashcardsPorApunte(id) {
       this.loading = true;
       try {
         const res = await axios.get(`http://localhost:3000/api/flashcards/apunte/${id}`);
-        this.flashcards = this.shuffleArray(res.data);
+        this.flashcards = this.mezclarArreglo(res.data);
         if (this.flashcards.length > 0) {
           this.selectedMateriaId = this.flashcards[0].id_materia;
           this.modoEstudio = true; // Iniciar directamente
@@ -322,7 +322,7 @@ export default {
         this.loading = false;
       }
     },
-    shuffleArray(array) {
+    mezclarArreglo(array) {
       const a = [...array];
       for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -376,7 +376,7 @@ export default {
         this.modoEstudio = false;
         this.resumenFinal = true;
         await this.guardarProgreso();
-        this.animateScore();
+        this.animarPuntaje();
         return;
       }
       this.currentIndex++;
@@ -404,7 +404,7 @@ export default {
     },
 
     // Animación del score
-    animateScore() {
+    animarPuntaje() {
       const target = this.scorePercent;
       let current = 0;
       const interval = setInterval(() => {
@@ -418,7 +418,7 @@ export default {
     },
 
     repetirEstudio() {
-      this.flashcards = this.shuffleArray(this.flashcards);
+      this.flashcards = this.mezclarArreglo(this.flashcards);
       this.resumenFinal = false;
       this.iniciarEstudio();
     },

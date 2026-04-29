@@ -1,22 +1,22 @@
 const service = require('../services/materias.service');
 
-exports.getAll = async (req, res) => {
+exports.obtenerTodas = async (req, res) => {
   try {
     const id_usuario = req.query.id_usuario;
-    const data = await service.getAll(id_usuario);
+    const data = await service.obtenerTodas(id_usuario);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Error obteniendo materias' });
   }
 };
 
-exports.getWithStats = async (req, res) => {
+exports.obtenerConEstadisticas = async (req, res) => {
   try {
     const id_usuario = req.query.id_usuario;
     if (!id_usuario) {
       return res.status(400).json({ error: 'id_usuario requerido' });
     }
-    const data = await service.getWithStats(id_usuario);
+    const data = await service.obtenerConEstadisticas(id_usuario);
     res.json(data);
   } catch (error) {
     console.error("Error obteniendo materias con stats:", error);
@@ -24,9 +24,9 @@ exports.getWithStats = async (req, res) => {
   }
 };
 
-exports.getById = async (req, res) => {
+exports.obtenerPorId = async (req, res) => {
   try {
-    const data = await service.getById(req.params.id);
+    const data = await service.obtenerPorId(req.params.id);
     if (!data) return res.status(404).json({ error: 'Materia no encontrada' });
     res.json(data);
   } catch (error) {
@@ -34,14 +34,14 @@ exports.getById = async (req, res) => {
   }
 };
 
-exports.create = async (req, res) => {
+exports.crear = async (req, res) => {
   try {
     const payload = {
       id_usuario: req.body.id_usuario || 1, // Simulación de sesión hasta integrar token
       nombre_materia: req.body.nombre_materia,
       descripcion: req.body.descripcion
     };
-    const nueva = await service.create(payload);
+    const nueva = await service.crear(payload);
     res.status(201).json(nueva);
   } catch (error) {
     console.error(error);
@@ -49,9 +49,9 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.update = async (req, res) => {
+exports.actualizar = async (req, res) => {
   try {
-    const actualizada = await service.update(req.params.id, req.body);
+    const actualizada = await service.actualizar(req.params.id, req.body);
     if (!actualizada) return res.status(404).json({ error: 'Materia no encontrada' });
     res.json(actualizada);
   } catch (error) {
@@ -59,9 +59,9 @@ exports.update = async (req, res) => {
   }
 };
 
-exports.remove = async (req, res) => {
+exports.eliminar = async (req, res) => {
   try {
-    const ok = await service.remove(req.params.id);
+    const ok = await service.eliminar(req.params.id);
     if (!ok) return res.status(404).json({ error: 'Materia no encontrada' });
     res.json({ message: 'Materia eliminada' });
   } catch (error) {

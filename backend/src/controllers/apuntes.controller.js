@@ -1,15 +1,15 @@
 const service = require('../services/apuntes.service');
 
-exports.getByMateria = async (req, res) => {
+exports.obtenerPorMateria = async (req, res) => {
   try {
-    const data = await service.getByMateria(req.params.materiaId);
+    const data = await service.obtenerPorMateria(req.params.materiaId);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Error obteniendo apuntes' });
   }
 };
 
-exports.create = async (req, res) => {
+exports.crear = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Debes enviar un archivo' });
@@ -21,7 +21,7 @@ exports.create = async (req, res) => {
       tipo_archivo: req.file.mimetype,
       tamaño_bytes: req.file.size
     };
-    const nuevo = await service.create(data);
+    const nuevo = await service.crear(data);
     res.status(201).json(nuevo);
   } catch (error) {
     console.error(error);

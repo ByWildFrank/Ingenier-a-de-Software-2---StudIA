@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.get('/materia/:materiaId', controller.getByMateria);
-router.post('/', upload.single('archivo'), controller.create);
+router.get('/materia/:materiaId', controller.obtenerPorMateria);
+router.post('/', upload.single('archivo'), controller.crear);
 
 module.exports = router;

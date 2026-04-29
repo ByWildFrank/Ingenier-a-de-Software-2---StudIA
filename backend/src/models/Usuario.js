@@ -9,7 +9,7 @@ class Usuario {
     this.activo = activo;
   }
 
-  static fromDB(row) {
+  static desdeDB(row) {
     return new Usuario(row);
   }
 

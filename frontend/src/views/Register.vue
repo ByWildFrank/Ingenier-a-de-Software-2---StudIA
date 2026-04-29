@@ -3,7 +3,7 @@
     <div class="register-card">
       <h2>Crear Cuenta</h2>
 
-      <form @submit.prevent="register">
+      <form @submit.prevent="registrar">
         <div class="form-group">
           <label>Nombre</label>
           <input v-model="nombre" type="text" required />
@@ -51,11 +51,11 @@ export default {
     };
   },
   methods: {
-    async register() {
+    async registrar() {
       this.error = null;
 
       try {
-        const usuario = await authService.register(
+        const usuario = await authService.registrar(
           this.nombre, 
           this.correo, 
           this.contraseña, 

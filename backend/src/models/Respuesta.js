@@ -7,7 +7,7 @@ class Respuesta {
     this.activo = activo;
   }
 
-  static fromDB(row) {
+  static desdeDB(row) {
     return new Respuesta(row);
   }
 
@@ -21,7 +21,7 @@ class Respuesta {
     };
   }
 
-  static validate(data) {
+  static validar(data) {
     if (!data.id_flashcard) throw new Error("La respuesta debe pertenecer a una flashcard");
     if (!data.texto_respuesta) throw new Error("El texto de la respuesta es obligatorio");
   }

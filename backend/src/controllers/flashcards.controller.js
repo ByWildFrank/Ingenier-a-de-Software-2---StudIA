@@ -1,17 +1,17 @@
 const service = require('../services/flashcards.service');
 
-exports.getByApunte = async (req, res) => {
+exports.obtenerPorApunte = async (req, res) => {
   try {
-    const data = await service.getByApunte(req.params.apunteId);
+    const data = await service.obtenerPorApunte(req.params.apunteId);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Error obteniendo flashcards' });
   }
 };
 
-exports.getByMateria = async (req, res) => {
+exports.obtenerPorMateria = async (req, res) => {
   try {
-    const data = await service.getByMateriaWithAnswers(req.params.materiaId);
+    const data = await service.obtenerPorMateriaConRespuestas(req.params.materiaId);
     res.json(data);
   } catch (error) {
     console.error("Error obteniendo flashcards por materia:", error);
@@ -19,14 +19,14 @@ exports.getByMateria = async (req, res) => {
   }
 };
 
-exports.generate = async (req, res) => {
+exports.generar = async (req, res) => {
   try {
     const { id_apunte } = req.body;
     if (!id_apunte) {
       return res.status(400).json({ error: 'Debes enviar el id_apunte' });
     }
     
-    const generadas = await service.generateAndSave(id_apunte);
+    const generadas = await service.generarYGuardar(id_apunte);
     res.status(201).json(generadas);
   } catch (error) {
     console.error("Error en generate:", error);
@@ -34,7 +34,7 @@ exports.generate = async (req, res) => {
   }
 };
 
-exports.saveProgress = async (req, res) => {
+exports.guardarProgreso = async (req, res) => {
   try {
     const { id_materia, aciertos, total, porcentaje } = req.body;
     const data = {
@@ -43,7 +43,7 @@ exports.saveProgress = async (req, res) => {
       avance_porcentual: porcentaje,
       comentarios: `Examen: ${aciertos}/${total} correctas (${porcentaje}%)`
     };
-    const result = await service.saveProgress(data);
+    const result = await service.guardarProgreso(data);
     res.status(201).json(result);
   } catch (error) {
     console.error("Error guardando progreso:", error);
