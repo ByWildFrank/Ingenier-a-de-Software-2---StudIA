@@ -34,21 +34,22 @@ La salida DEBE SER ÚNICAMENTE un arreglo JSON válido siguiendo exactamente est
   }
 ]`;
 
-/**
- * Extrae texto de archivos .docx y .pptx que Gemini no soporta directamente.
- * @returns {string|null} El texto extraído, o null si el formato es nativo de Gemini.
- */
-async function extraerTextoSiEsNecesario(filePath) {
-  const ext = path.extname(filePath).toLowerCase();
+// ==========================================
+// PATRÓN STRATEGY (Implementación con Objetos)
+// ==========================================
 
-  if (ext === '.docx' || ext === '.doc') {
+const EstrategiaDocx = {
+  soporta: (ext) => ext === '.docx' || ext === '.doc',
+  extraerTexto: async (filePath) => {
     console.log("Extrayendo texto del DOCX con mammoth...");
     const result = await mammoth.extractRawText({ path: filePath });
     return result.value;
   }
+};
 
-  if (ext === '.pptx' || ext === '.ppt') {
-    // Intentamos leer las slides como texto plano (pptx es un ZIP con XMLs)
+const EstrategiaPptx = {
+  soporta: (ext) => ext === '.pptx' || ext === '.ppt',
+  extraerTexto: async (filePath) => {
     console.log("Extrayendo texto del PPT/PPTX...");
     try {
       const AdmZip = require('adm-zip');
@@ -58,7 +59,6 @@ async function extraerTextoSiEsNecesario(filePath) {
       for (const entry of entries) {
         if (entry.entryName.startsWith('ppt/slides/slide') && entry.entryName.endsWith('.xml')) {
           const xml = entry.getData().toString('utf8');
-          // Extraer texto de los tags <a:t>
           const matches = xml.match(/<a:t>([^<]*)<\/a:t>/g);
           if (matches) {
             text += matches.map(m => m.replace(/<\/?a:t>/g, '')).join(' ') + '\n\n';
@@ -71,8 +71,28 @@ async function extraerTextoSiEsNecesario(filePath) {
       return 'No se pudo extraer texto del archivo.';
     }
   }
+};
 
-  return null; // Gemini puede procesar el archivo directamente
+const EstrategiaNativaGemini = {
+  soporta: (ext) => true, // Estrategia por defecto si ninguna anterior coincide
+  extraerTexto: async (filePath) => null // Retorna null para indicar que Gemini debe procesar el archivo nativamente
+};
+
+// Colección de estrategias disponibles
+const estrategiasDeExtraccion = [EstrategiaDocx, EstrategiaPptx, EstrategiaNativaGemini];
+
+/**
+ * Extrae texto delegando la tarea al objeto estrategia correspondiente según la extensión.
+ * @returns {string|null} El texto extraído, o null si el formato es nativo de Gemini.
+ */
+async function extraerTextoSiEsNecesario(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  
+  // Seleccionamos la estrategia dinámicamente en tiempo de ejecución
+  const estrategia = estrategiasDeExtraccion.find(e => e.soporta(ext));
+  
+  // Ejecutamos la estrategia (polimorfismo conceptual)
+  return await estrategia.extraerTexto(filePath);
 }
 
 exports.generarFlashcardsDesdeArchivo = async (filePath, mimeType, displayName) => {
@@ -102,6 +122,7 @@ exports.generarFlashcardsDesdeArchivo = async (filePath, mimeType, displayName) 
       FLASHCARD_PROMPT
     ];
   } else {
+    
     // Estrategia ARCHIVO: subir a Gemini File API (PDF, imágenes, texto)
     const ext = path.extname(filePath).toLowerCase();
     const resolvedMime = GEMINI_SUPPORTED_MIMES[ext] || 'application/octet-stream';
