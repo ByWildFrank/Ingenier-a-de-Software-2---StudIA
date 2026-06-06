@@ -19,3 +19,4 @@ F -> R: cargarRespuestasParaFlashcards(id_materia)
 F --> UI: Lista de preguntas
 R --> UI: Lista de respuestas
 UI --> Estudiante: Interfaz muestra vista de tarjeta de pregunta con respuesta
+@enduml
