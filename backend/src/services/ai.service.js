@@ -15,6 +15,12 @@ const GEMINI_SUPPORTED_MIMES = {
   '.gif': 'image/gif',
 };
 
+// Tipos de resultado posibles para el retorno de las estrategias
+const TIPO_RESULTADO = Object.freeze({
+  TEXTO_EXTRAIDO: 'TEXTO_EXTRAIDO',
+  ARCHIVO_NATIVO: 'ARCHIVO_NATIVO'
+});
+
 // Prompt para generar flashcards
 const FLASHCARD_PROMPT = `Eres un asistente de estudio experto. Analiza el contenido proporcionado y crea una lista de flashcards (tarjetas de estudio).
 Extrae la información más importante. Genera entre 8 y 12 flashcards de alta calidad.
@@ -35,25 +41,64 @@ La salida DEBE SER ÚNICAMENTE un arreglo JSON válido siguiendo exactamente est
 ]`;
 
 // ==========================================
-// PATRÓN STRATEGY (Implementación con Objetos)
+// PATRÓN STRATEGY (Implementación formal con Clases ES6)
 // ==========================================
 
-const EstrategiaDocx = {
-  soporta: (ext) => ext === '.docx' || ext === '.doc',
-  extraerTexto: async (filePath) => {
-    console.log("Extrayendo texto del DOCX con mammoth...");
-    const result = await mammoth.extractRawText({ path: filePath });
-    return result.value;
+/**
+ * Clase Abstracta - EstrategiaExtraccion
+ * Define el contrato que todas las estrategias concretas deben cumplir.
+ * Ninguna instancia de esta clase debe usarse directamente.
+ */
+class EstrategiaExtraccion {
+  /**
+   * Determina si esta estrategia puede procesar un archivo con la extensión dada.
+   * @param {string} extension - La extensión del archivo (ej: '.docx', '.pptx').
+   * @returns {boolean}
+   */
+  soporta(extension) {
+    throw new Error('El método soporta() debe ser implementado por la estrategia concreta.');
   }
-};
 
-const EstrategiaPptx = {
-  soporta: (ext) => ext === '.pptx' || ext === '.ppt',
-  extraerTexto: async (filePath) => {
+  /**
+   * Extrae el texto del archivo ubicado en la ruta proporcionada.
+   * @param {string} rutaArchivo - Ruta absoluta al archivo.
+   * @returns {Promise<{tipo: string, datos: object}>} Objeto tipado con el resultado de la estrategia.
+   */
+  async extraerTexto(rutaArchivo) {
+    throw new Error('El método extraerTexto() debe ser implementado por la estrategia concreta.');
+  }
+}
+
+/**
+ * Estrategia Concreta - Extracción de texto para archivos Word (.docx, .doc)
+ * Utiliza la librería mammoth para convertir el documento a texto plano.
+ */
+class EstrategiaDocx extends EstrategiaExtraccion {
+  soporta(extension) {
+    return extension === '.docx' || extension === '.doc';
+  }
+
+  async extraerTexto(rutaArchivo) {
+    console.log("Extrayendo texto del DOCX con mammoth...");
+    const result = await mammoth.extractRawText({ path: rutaArchivo });
+    return { tipo: TIPO_RESULTADO.TEXTO_EXTRAIDO, datos: { texto: result.value } };
+  }
+}
+
+/**
+ * Estrategia Concreta - Extracción de texto para archivos PowerPoint (.pptx, .ppt)
+ * Descomprime el archivo OOXML y parsea el texto de las diapositivas.
+ */
+class EstrategiaPptx extends EstrategiaExtraccion {
+  soporta(extension) {
+    return extension === '.pptx' || extension === '.ppt';
+  }
+
+  async extraerTexto(rutaArchivo) {
     console.log("Extrayendo texto del PPT/PPTX...");
     try {
       const AdmZip = require('adm-zip');
-      const zip = new AdmZip(filePath);
+      const zip = new AdmZip(rutaArchivo);
       const entries = zip.getEntries();
       let text = '';
       for (const entry of entries) {
@@ -65,25 +110,37 @@ const EstrategiaPptx = {
           }
         }
       }
-      return text || 'No se pudo extraer texto del archivo.';
+      const textoFinal = text || 'No se pudo extraer texto del archivo.';
+      return { tipo: TIPO_RESULTADO.TEXTO_EXTRAIDO, datos: { texto: textoFinal } };
     } catch (e) {
       console.error("Error extrayendo PPT:", e.message);
-      return 'No se pudo extraer texto del archivo.';
+      return { tipo: TIPO_RESULTADO.TEXTO_EXTRAIDO, datos: { texto: 'No se pudo extraer texto del archivo.' } };
     }
   }
-};
-
-const EstrategiaNativaGemini = {
-  soporta: (ext) => true, // Estrategia por defecto si ninguna anterior coincide
-  extraerTexto: async (filePath) => null // Retorna null para indicar que Gemini debe procesar el archivo nativamente
-};
-
-// Colección de estrategias disponibles
-const estrategiasDeExtraccion = [EstrategiaDocx, EstrategiaPptx, EstrategiaNativaGemini];
+}
 
 /**
- * Extrae texto delegando la tarea al objeto estrategia correspondiente según la extensión.
- * @returns {string|null} El texto extraído, o null si el formato es nativo de Gemini.
+ * Estrategia Concreta - Delegación nativa a Gemini
+ * Actúa como estrategia por defecto para formatos que Gemini procesa directamente
+ * (PDF, imágenes, texto plano). Retorna ARCHIVO_NATIVO para señalar que no se requiere extracción local.
+ */
+class EstrategiaNativaGemini extends EstrategiaExtraccion {
+  soporta(extension) {
+    return true; // Estrategia por defecto si ninguna anterior coincide
+  }
+
+  async extraerTexto(rutaArchivo) {
+    return { tipo: TIPO_RESULTADO.ARCHIVO_NATIVO, datos: { rutaArchivo } };
+  }
+}
+
+// Colección de instancias de estrategias disponibles
+const estrategiasDeExtraccion = [new EstrategiaDocx(), new EstrategiaPptx(), new EstrategiaNativaGemini()];
+
+/**
+ * Extrae texto delegando la tarea a la estrategia correspondiente según la extensión.
+ * @param {string} filePath - Ruta al archivo a procesar.
+ * @returns {Promise<{tipo: string, datos: object}>} Objeto tipado con el resultado de la estrategia.
  */
 async function extraerTextoSiEsNecesario(filePath) {
   const ext = path.extname(filePath).toLowerCase();
@@ -91,8 +148,40 @@ async function extraerTextoSiEsNecesario(filePath) {
   // Seleccionamos la estrategia dinámicamente en tiempo de ejecución
   const estrategia = estrategiasDeExtraccion.find(e => e.soporta(ext));
   
-  // Ejecutamos la estrategia (polimorfismo conceptual)
+  // Ejecutamos la estrategia (polimorfismo real mediante herencia)
   return await estrategia.extraerTexto(filePath);
+}
+
+exports.extraerTextoSiEsNecesario = extraerTextoSiEsNecesario;
+exports.TIPO_RESULTADO = TIPO_RESULTADO;
+
+/**
+ * Extrae el primer arreglo JSON completo de un string usando balance de corchetes.
+ * Maneja correctamente strings con caracteres escapados y estructuras anidadas.
+ * @param {string} str - El string que contiene el JSON.
+ * @returns {string|null} El substring del arreglo JSON balanceado, o null si no se encuentra.
+ */
+function extraerArregloJSON(str) {
+  const inicio = str.indexOf('[');
+  if (inicio === -1) return null;
+
+  let profundidad = 0;
+  let enString = false;
+  let escape = false;
+
+  for (let i = inicio; i < str.length; i++) {
+    const ch = str[i];
+    if (escape) { escape = false; continue; }
+    if (ch === '\\' && enString) { escape = true; continue; }
+    if (ch === '"') { enString = !enString; continue; }
+    if (enString) continue;
+    if (ch === '[') profundidad++;
+    if (ch === ']') {
+      profundidad--;
+      if (profundidad === 0) return str.substring(inicio, i + 1);
+    }
+  }
+  return null;
 }
 
 exports.generarFlashcardsDesdeArchivo = async (filePath, mimeType, displayName) => {
@@ -111,24 +200,24 @@ exports.generarFlashcardsDesdeArchivo = async (filePath, mimeType, displayName) 
   });
 
   // Decidir estrategia: subir archivo o enviar texto extraído
-  const extractedText = await extraerTextoSiEsNecesario(filePath);
+  const resultado = await extraerTextoSiEsNecesario(filePath);
   let contentParts;
 
-  if (extractedText) {
+  if (resultado.tipo === TIPO_RESULTADO.TEXTO_EXTRAIDO) {
     // Estrategia TEXTO: enviar el contenido extraído directamente como texto
-    console.log(`Texto extraído correctamente (${extractedText.length} caracteres). Enviando a Gemini como texto...`);
+    console.log(`Texto extraído correctamente (${resultado.datos.texto.length} caracteres). Enviando a Gemini como texto...`);
     contentParts = [
-      `Contenido del documento "${displayName}":\n\n${extractedText}`,
+      `Contenido del documento "${displayName}":\n\n${resultado.datos.texto}`,
       FLASHCARD_PROMPT
     ];
-  } else {
+  } else if (resultado.tipo === TIPO_RESULTADO.ARCHIVO_NATIVO) {
     
     // Estrategia ARCHIVO: subir a Gemini File API (PDF, imágenes, texto)
-    const ext = path.extname(filePath).toLowerCase();
+    const ext = path.extname(resultado.datos.rutaArchivo).toLowerCase();
     const resolvedMime = GEMINI_SUPPORTED_MIMES[ext] || 'application/octet-stream';
-    console.log(`Subiendo archivo a Gemini: ${filePath} (${resolvedMime})`);
+    console.log(`Subiendo archivo a Gemini: ${resultado.datos.rutaArchivo} (${resolvedMime})`);
 
-    const uploadResponse = await fileManager.uploadFile(filePath, {
+    const uploadResponse = await fileManager.uploadFile(resultado.datos.rutaArchivo, {
       mimeType: resolvedMime,
       displayName
     });
@@ -152,22 +241,26 @@ exports.generarFlashcardsDesdeArchivo = async (filePath, mimeType, displayName) 
   const outputText = result.response.text();
   console.log(`Respuesta recibida desde Gemini (${outputText.length} caracteres).`);
   
-  // Limpieza robusta de JSON (extrae lo que haya entre los primeros [ y últimos ])
-  let jsonStr = outputText.trim();
-  const start = jsonStr.indexOf('[');
-  const end = jsonStr.lastIndexOf(']');
+  // Limpieza robusta de JSON con múltiples estrategias de parseo
+  let jsonStr = outputText.trim().replace(/```json|```/g, '').trim();
   
-  if (start !== -1 && end !== -1) {
-    jsonStr = jsonStr.substring(start, end + 1);
-  } else {
-    // Si no hay brackets, intentamos limpiar markdown básico
-    jsonStr = jsonStr.replace(/```json|```/g, '').trim();
-  }
-  
+  // Intento 1: parsear directamente (responseMimeType debería dar JSON válido)
   try {
-    return JSON.parse(jsonStr);
-  } catch (e) {
-    console.error("Error parseando JSON de Gemini. Fragmento final:", jsonStr.slice(-50));
-    throw new Error("La IA generó un formato de datos inválido. Por favor, intenta de nuevo.");
+    const parsed = JSON.parse(jsonStr);
+    if (Array.isArray(parsed)) return parsed;
+    // Si Gemini envolvió el arreglo en un objeto, extraer el primer arreglo encontrado
+    const arr = Object.values(parsed).find(v => Array.isArray(v));
+    if (arr) return arr;
+  } catch (_) {}
+
+  // Intento 2: extraer el arreglo JSON usando balance de corchetes
+  const arregloExtraido = extraerArregloJSON(jsonStr);
+  if (arregloExtraido) {
+    try {
+      return JSON.parse(arregloExtraido);
+    } catch (_) {}
   }
+
+  console.error("Error parseando JSON de Gemini. Fragmento final:", jsonStr.slice(-80));
+  throw new Error("La IA generó un formato de datos inválido. Por favor, intenta de nuevo.");
 };

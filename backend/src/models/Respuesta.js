@@ -7,6 +7,36 @@ class Respuesta {
     this.activo = activo;
   }
 
+  // --- Getters ---
+
+  getTextoRespuesta() {
+    return this.texto_respuesta;
+  }
+
+  getEsCorrecta() {
+    return this.es_correcta;
+  }
+
+  getActivo() {
+    return this.activo;
+  }
+
+  // --- Setters ---
+
+  setTextoRespuesta(textoRespuesta) {
+    this.texto_respuesta = textoRespuesta;
+  }
+
+  setEsCorrecta(esCorrecta) {
+    this.es_correcta = esCorrecta;
+  }
+
+  setActivo(activo) {
+    this.activo = activo;
+  }
+
+  // --- Métodos de Infraestructura ---
+
   static desdeDB(row) {
     return new Respuesta(row);
   }

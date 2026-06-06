@@ -8,9 +8,30 @@ class Pomodoro {
     this.activo = activo;
   }
 
-  static desdeDB(row) {
-    return new Pomodoro(row);
+  getFecha() { return this.fecha; }
+  getDuracionEstudio() { return this.duracion_estudio; }
+  getDuracionDescanso() { return this.duracion_descanso; }
+  getActivo() { return this.activo; }
+
+  setFecha(fecha) { this.fecha = fecha; }
+  setDuracionEstudio(d) { this.duracion_estudio = d; }
+  setDuracionDescanso(d) { this.duracion_descanso = d; }
+  setActivo(activo) { this.activo = activo; }
+
+  iniciarSesionEstudio() {
+    this.fecha = new Date();
+    this.activo = true;
   }
+
+  iniciarDescanso() {
+    console.log(`Descanso iniciado: ${this.duracion_descanso} minutos.`);
+  }
+
+  finalizarPomodoro() {
+    this.activo = false;
+  }
+
+  static desdeDB(row) { return new Pomodoro(row); }
 
   toJSON() {
     return {

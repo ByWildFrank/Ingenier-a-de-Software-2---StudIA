@@ -1,11 +1,12 @@
 const { obtenerConexion } = require('../database/db');
+const Materia = require('../models/Materia');
 
 exports.obtenerTodas = async (id_usuario) => {
   const pool = await obtenerConexion();
   const result = await pool.request()
     .input('id_usuario', id_usuario)
     .execute('sp_Materia_ObtenerPorUsuario');
-  return result.recordset;
+  return result.recordset.map(row => Materia.desdeDB(row));
 };
 
 exports.obtenerPorId = async (id) => {
@@ -13,7 +14,7 @@ exports.obtenerPorId = async (id) => {
   const result = await pool.request()
     .input('id_materia', id)
     .execute('sp_Materia_ObtenerPorID');
-  return result.recordset[0];
+  return result.recordset[0] ? Materia.desdeDB(result.recordset[0]) : null;
 };
 
 exports.crear = async (data) => {
@@ -25,7 +26,7 @@ exports.crear = async (data) => {
     .execute('sp_Materia_Crear');
 
   const id_materia = result.recordset[0] ? Object.values(result.recordset[0])[0] : null;
-  return { id_materia, ...data };
+  return Materia.desdeDB({ id_materia, ...data });
 };
 
 exports.actualizar = async (id, data) => {

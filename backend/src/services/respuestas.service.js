@@ -1,29 +1,25 @@
 const { obtenerConexion } = require('../database/db');
+const Respuesta = require('../models/Respuesta');
 
 exports.obtenerPorFlashcard = async (flashcardId) => {
   const pool = await obtenerConexion();
   const result = await pool.request()
-    .input('flashcardId', flashcardId)
-    .query(`
-      SELECT RespuestaID, FlashcardID, Texto, EsCorrecta
-      FROM RespuestasFlashcard
-      WHERE FlashcardID = @flashcardId
-    `);
+    .input('id_flashcard', flashcardId)
+    .execute('sp_Respuesta_ObtenerPorFlashcard');
 
-  return result.recordset;
+  return result.recordset.map(row => Respuesta.desdeDB(row));
 };
 
 exports.crear = async (data) => {
   const pool = await obtenerConexion();
   const result = await pool.request()
-    .input('flashcardId', data.flashcardId)
-    .input('texto', data.texto)
-    .input('esCorrecta', data.esCorrecta)
-    .query(`
-      INSERT INTO RespuestasFlashcard (FlashcardID, Texto, EsCorrecta)
-      VALUES (@flashcardId, @texto, @esCorrecta);
-      SELECT SCOPE_IDENTITY() AS id;
-    `);
+    .input('id_flashcard', data.id_flashcard)
+    .input('texto_respuesta', data.texto_respuesta)
+    .input('es_correcta', data.es_correcta)
+    .execute('sp_Respuesta_Crear');
 
-  return { id: result.recordset[0].id, ...data };
+  return Respuesta.desdeDB({
+    id_respuesta: Object.values(result.recordset[0])[0],
+    ...data
+  });
 };

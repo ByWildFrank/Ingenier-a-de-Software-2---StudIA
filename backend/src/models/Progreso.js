@@ -8,9 +8,25 @@ class Progreso {
     this.activo = activo;
   }
 
-  static desdeDB(row) {
-    return new Progreso(row);
+  getAvancePorcentual() { return this.avance_porcentual; }
+  getComentarios() { return this.comentarios; }
+  getActivo() { return this.activo; }
+
+  setAvancePorcentual(avance) { this.avance_porcentual = avance; }
+  setComentarios(comentarios) { this.comentarios = comentarios; }
+  setActivo(activo) { this.activo = activo; }
+
+  actualizarAvance(nuevoAvance) {
+    this.avance_porcentual = nuevoAvance;
   }
+
+  agregarComentario(texto) {
+    this.comentarios = this.comentarios
+      ? `${this.comentarios}\n${texto}`
+      : texto;
+  }
+
+  static desdeDB(row) { return new Progreso(row); }
 
   toJSON() {
     return {
