@@ -1,0 +1,20 @@
+@startuml
+actor Estudiante
+participant "Interfaz" as UI
+participant "Materias" as M
+participant "Apuntes" as A
+participant "Flashcards" as F
+participant "Respuesta" as R
+
+
+UI --> Estudiante: Muestra menú
+Estudiante -> UI: Selecciona "Usar flashcards"
+UI --> Estudiante: Muestra sección de selección de materia
+Estudiante -> UI: Selección de materia
+Alt No existen flashcards
+    UI -> F: solicita las flashcards con respuestas (id_materia)
+    F -> F: exports.obtenerPorMateriaConRespuestas(id_materia)
+    F --> UI: Error, no hay flashcards
+    UI --> Estudiante: Muestra mensaje de "No hay flashcards generadas para esta materia. Creá algunas primero"
+    Ref over F, M, Estudiante, A, R: Ir a caso de uso: Crar flashcards
+end

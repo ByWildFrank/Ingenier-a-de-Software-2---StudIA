@@ -1,0 +1,24 @@
+@startuml
+actor Estudiante
+participant "Interfaz" as UI
+participant "Materias" as M
+
+
+UI --> Estudiante: Muestra menú
+Estudiante -> UI: Selecciona "Materias"
+UI --> Estudiante: Muestra interfaz de Crear materia
+Estudiante -> UI: Ingresa dato(nombre, descripción)
+UI -> M: Solicita crear materia (id_usuario, nombre_materia, descripcion)
+M -> M: exports.crear(id_usuario, nombre_materia, descripcion)
+M -> M: Valida los datos
+alt Campos incompletos
+    M --> UI: Error, campo(s) vacío(s)
+    UI --> Estudiante: Muestra error de campos incompletos
+end
+
+
+
+
+
+
+
