@@ -1,0 +1,15 @@
+@startuml
+actor Estudiante
+participant "Interfaz" as UI
+participant "Materias" as M
+participant "Apuntes" as A
+participant "Flashcards" as F
+participant "Respuesta" as R
+
+
+UI --> Estudiante: Muestra menú
+Estudiante -> UI: Selecciona "Usar flashcards"
+UI --> Estudiante: Muestra sección de selección de materia
+Alt No existen materias
+    Ref over F, M, Estudiante, A, R: Ir a caso de uso: Crar materia
+end

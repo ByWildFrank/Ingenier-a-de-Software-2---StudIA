@@ -1,0 +1,31 @@
+@startuml
+actor Estudiante
+participant "Interfaz" as UI
+participant "Materias" as M
+participant "Apuntes" as A 
+participant "Flashcards" as F 
+participant "Respuesta" as R 
+
+
+
+
+UI --> Estudiante: Muestra menú
+Estudiante -> UI: Selecciona "Crear flashcards"
+UI --> Estudiante: Interfaz pregunta por la pertenencia del apunte
+UI -> M: Solicita lista de materias (id_usuario)
+M -> M: exports.obtenerTodas(id_usuario)
+M --> UI: Lista de materias
+Estudiante -> UI: Selecciona materia existente
+UI --> Estudiante: Muestra intefaz de selección de archivo
+
+Alt Archivo inválido
+Estudiante -> UI: Selecciona archivo 
+UI --> Estudiante: Muestra error de archivo inválido
+UI --> Estudiante: Muestra intefaz de selección de archivo
+end
+
+
+
+
+
+

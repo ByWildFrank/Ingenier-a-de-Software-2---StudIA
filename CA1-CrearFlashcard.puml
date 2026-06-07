@@ -1,0 +1,26 @@
+@startuml
+actor Estudiante
+participant "Interfaz" as UI
+participant "Materias" as M
+participant "Apuntes" as A 
+participant "Flashcards" as F 
+participant "Respuesta" as R 
+
+
+
+
+UI --> Estudiante: Muestra menú
+Estudiante -> UI: Selecciona "Crear flashcards"
+UI --> Estudiante: Interfaz pregunta por la pertenencia del apunte
+UI -> M: exports.obtenerTodas(id_usuario)
+Alt No está la materia deseada / No existen materias registradas
+    Estudiante -> UI: Selecciona Crear Materia
+    Ref over Estudiante, UI, M: Ir a caso de uso: Crear Materia.
+end 
+
+
+
+
+
+
+

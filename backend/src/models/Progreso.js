@@ -1,0 +1,43 @@
+class Progreso {
+  constructor({ id_progreso, id_usuario, id_materia, avance_porcentual, comentarios, activo }) {
+    this.id_progreso = id_progreso;
+    this.id_usuario = id_usuario;
+    this.id_materia = id_materia;
+    this.avance_porcentual = avance_porcentual;
+    this.comentarios = comentarios?.trim();
+    this.activo = activo;
+  }
+
+  getAvancePorcentual() { return this.avance_porcentual; }
+  getComentarios() { return this.comentarios; }
+  getActivo() { return this.activo; }
+
+  setAvancePorcentual(avance) { this.avance_porcentual = avance; }
+  setComentarios(comentarios) { this.comentarios = comentarios; }
+  setActivo(activo) { this.activo = activo; }
+
+  actualizarAvance(nuevoAvance) {
+    this.avance_porcentual = nuevoAvance;
+  }
+
+  agregarComentario(texto) {
+    this.comentarios = this.comentarios
+      ? `${this.comentarios}\n${texto}`
+      : texto;
+  }
+
+  static desdeDB(row) { return new Progreso(row); }
+
+  toJSON() {
+    return {
+      id_progreso: this.id_progreso,
+      id_usuario: this.id_usuario,
+      id_materia: this.id_materia,
+      avance_porcentual: this.avance_porcentual,
+      comentarios: this.comentarios,
+      activo: this.activo
+    };
+  }
+}
+
+module.exports = Progreso;
