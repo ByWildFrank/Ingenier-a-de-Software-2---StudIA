@@ -9,14 +9,15 @@ participant "Respuesta" as R
 
 
 
-UI --> Estudiante: Muestra menú
 Estudiante -> UI: Selecciona "Crear flashcards"
-UI --> Estudiante: Interfaz pregunta por la pertenencia del apunte
-UI -> M: exports.obtenerTodas(id_usuario)
+UI -> M: Solicita lista de materias (id_usuario)
+M -> M: exports.obtenerTodas(id_usuario)
+M --> UI: Lista vacía
 Alt No está la materia deseada / No existen materias registradas
     Estudiante -> UI: Selecciona Crear Materia
     Ref over Estudiante, UI, M: Ir a caso de uso: Crear Materia.
 end 
+@enduml
 
 
 

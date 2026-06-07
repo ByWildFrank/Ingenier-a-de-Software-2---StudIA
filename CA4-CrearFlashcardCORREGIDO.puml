@@ -8,35 +8,35 @@ participant "Respuesta" as R
 
 
 
-
-UI --> Estudiante: Muestra menú
+' === FASE 1: Selección de materia ===
 Estudiante -> UI: Selecciona "Crear flashcards"
-UI --> Estudiante: Interfaz pregunta por la pertenencia del apunte
-UI -> M: Solicita lista de materuas (id_usuario)
-M -> M : exports.obtenerTodas(id_usuario)
+UI -> M: Solicita lista de materias (id_usuario)
+M -> M: exports.obtenerTodas(id_usuario)
 M --> UI: Lista de materias
+UI --> Estudiante: Muestra lista de materias
+
+' === FASE 2: Carga de archivo ===
 Estudiante -> UI: Selecciona materia existente
-UI --> Estudiante: Muestra intefaz de selección de archivo
 Estudiante -> UI: Carga archivo (.pdf/.docx/.doc/.ppt)
-UI --> Estudiante: Muestra interfaz de subir el archivo
-Estudiante -> UI: Selecciona subir archivo
+Estudiante -> UI: Confirma subir archivo
 UI -> A: Solicita crear el apunte (id_materia, titulo, ruta_archivo, tipo_archivo, tamaño_bytes)
 A -> A: exports.crear(id_materia, titulo, ruta_archivo, tipo_archivo, tamaño_bytes)
-A -> A: Guarda el archivo
-A --> UI: Apunte válido
-UI --> Estudiante: Muestra interfaz de generar flashcards con IA
-UI -> F: Solicita generar y guardar la flashcard(id_apunte)
-F -> F: exports.generarYGuardar(id_apunte)
-F -> A: exports.obtenerPorId(id_apunte)
-A --> F: Datos del apunte (título, ruta)
+A --> UI: Apunte creado (id_apunte)
+
+' === FASE 3: Generación IA de flashcards ===
+UI -> F: exports.generarYGuardar(id_apunte)
+F -> A: Solicita datos del apunte (id_apunte)
+A -> A: exports.obtenerPorId(id_apunte)
+A --> F: Datos del apunte (titulo, ruta, tipo)
 F ->: aiService.generarFlashcardsDesdeArchivo(ruta, tipo, titulo)
+
 alt La IA falla o no genera contenido
     F <--: Respuesta vacía / Timeout
     F --> UI: Error: "La IA no pudo generar contenido"
     UI --> Estudiante: El sistema informa del error
     UI --> Estudiante: Muestra interfaz de generar flashcards con IA
 end
-
+@enduml
 
 
 
