@@ -38,7 +38,7 @@ Alt Flashcards no son almacenadas (Error SQL)
     UI --> Estudiante: Notifica error y solicita reintentar
 end
 
-
+@enduml
 
 
 
