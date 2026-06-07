@@ -94,7 +94,8 @@ class Flashcard {
       dificultad: this.dificultad,
       activa: this.activa,
       activo: this.activo,
-      titulo: this.titulo
+      titulo: this.titulo,
+      respuestas: this.respuestas || []
     };
   }
 

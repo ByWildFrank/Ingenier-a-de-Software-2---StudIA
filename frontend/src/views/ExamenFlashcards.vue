@@ -134,12 +134,12 @@
           <h3 class="card-question">{{ fc.pregunta }}</h3>
           <div class="correct-answer-box mt-3">
             <span class="label">Respuesta correcta:</span>
-            <p class="answer-text-active">{{ fc.respuestas.find(r => r.es_correcta)?.texto_respuesta }}</p>
+            <p class="answer-text-active">{{ fc.respuestas?.find(r => r.es_correcta)?.texto_respuesta || 'Sin respuesta' }}</p>
           </div>
           <div class="distractors mt-2">
             <span class="label-sm">Distractores:</span>
             <ul class="distractors-list">
-              <li v-for="(r, ri) in fc.respuestas.filter(r => !r.es_correcta)" :key="ri">
+              <li v-for="(r, ri) in (fc.respuestas || []).filter(r => !r.es_correcta)" :key="ri">
                 {{ r.texto_respuesta }}
               </li>
             </ul>
