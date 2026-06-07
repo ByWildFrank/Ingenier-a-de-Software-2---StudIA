@@ -6,15 +6,22 @@ participant "Apuntes" as A
 participant "Flashcards" as F
 participant "Respuesta" as R
 
-
-UI --> Estudiante: Muestra menú
+' === FASE 1: Selección de materia ===
 Estudiante -> UI: Selecciona "Usar flashcards"
+UI -> M: Solicita lista de materias (id_usuario)
+M -> M: exports.obtenerTodas(id_usuario)
+M --> UI: Lista de materias
 UI --> Estudiante: Muestra sección de selección de materia
+
+' === FASE 2: Selección de materia y validación ===
 Estudiante -> UI: Selección de materia
+UI -> F: solicita las flashcards con respuestas (id_materia)
+F -> F: exports.obtenerPorMateriaConRespuestas(id_materia)
+F --> UI: Lista vacía de flashcards
+
 Alt No existen flashcards
-    UI -> F: solicita las flashcards con respuestas (id_materia)
-    F -> F: exports.obtenerPorMateriaConRespuestas(id_materia)
-    F --> UI: Error, no hay flashcards
     UI --> Estudiante: Muestra mensaje de "No hay flashcards generadas para esta materia. Creá algunas primero"
-    Ref over F, M, Estudiante, A, R: Ir a caso de uso: Crar flashcards
+    Ref over F, M, Estudiante, A, R: Ir a caso de uso: Crear flashcards
 end
+@enduml
+

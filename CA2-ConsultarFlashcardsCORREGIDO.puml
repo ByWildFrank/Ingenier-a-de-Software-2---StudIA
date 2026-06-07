@@ -1,0 +1,19 @@
+@startuml
+actor Estudiante
+participant "Interfaz" as UI
+participant "Materias" as M
+participant "Apuntes" as A
+participant "Flashcards" as F
+participant "Respuesta" as R
+
+' === FASE 1: Intento de selección de materia ===
+Estudiante -> UI: Selecciona "Usar flashcards"
+UI -> M: Solicita lista de materias (id_usuario)
+M -> M: exports.obtenerTodas(id_usuario)
+M --> UI: Lista vacía de materias
+
+Alt No existen materias
+    UI --> Estudiante: Muestra sección de selección de materia vacía
+    Ref over F, M, Estudiante, A, R: Ir a caso de uso: Crear materia
+end
+@enduml

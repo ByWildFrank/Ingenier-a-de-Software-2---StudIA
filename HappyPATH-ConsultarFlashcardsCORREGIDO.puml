@@ -1,0 +1,38 @@
+@startuml
+actor Estudiante
+participant "Interfaz" as UI
+participant "Materias" as M
+participant "Apuntes" as A
+participant "Flashcards" as F
+participant "Respuesta" as R
+
+' === FASE 1: Selección de materia ===
+Estudiante -> UI: Selecciona "Usar flashcards"
+UI -> M: Solicita lista de materias (id_usuario)
+M -> M: exports.obtenerTodas(id_usuario)
+M --> UI: Lista de materias
+UI --> Estudiante: Muestra sección de selección de materia
+
+' === FASE 2: Selección de materia y carga de datos ===
+Estudiante -> UI: Selección de materia
+UI -> F: solicita las flashcards con respuestas (id_materia)
+F -> F: exports.obtenerPorMateriaConRespuestas(id_materia)
+
+loop Por cada flashcard
+  F -> F: Flashcard.desdeDB(datos)
+  F -> R: cargarRespuestasParaFlashcards(id_flashcard)
+  R -> R: Respuesta.desdeDB(datos)
+  R --> F: Instancia Respuesta
+end
+
+F --> UI: Lista de flashcards con respuestas (con contador)
+UI --> Estudiante: Muestra interfaz de opciones (Comenzar Estudio / Ver todas las respuestas)
+
+' === FASE 3: Caso de uso - Ver biblioteca de respuestas ===
+Estudiante -> UI: Selecciona "Ver todas las respuestas"
+UI -> F: solicita las respuestas de las flashcards
+F -> F: obtenerRespuestas()
+F --> UI: Lista de respuestas
+UI --> Estudiante: Interfaz muestra vista de tarjeta de pregunta con respuesta
+@enduml
+

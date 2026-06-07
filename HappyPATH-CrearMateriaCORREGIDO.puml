@@ -4,18 +4,26 @@ participant "Interfaz" as UI
 participant "Materias" as M
 
 
-UI --> Estudiante: Muestra menú
+' === FASE 1: Acceso a la sección de materias ===
 Estudiante -> UI: Selecciona "Materias"
-UI --> Estudiante: Muestra interfaz de Crear materia
+UI -> M: Solicita lista de materias (id_usuario)
+M -> M: exports.obtenerTodas(id_usuario)
+M --> UI: Lista de materias
+UI --> Estudiante: Muestra sección de materias
+
+' === FASE 2: Formulario de creación ===
+Estudiante -> UI: Selecciona "Crear materia"
+
+' === FASE 3: Creación de materia ===
 Estudiante -> UI: Ingresa dato(nombre, descripción)
 UI -> M: Solicita crear materia (id_usuario, nombre_materia, descripcion)
 M -> M: exports.crear(id_usuario, nombre_materia, descripcion)
-M -> M: Valida los datos
+
 M --> UI: Materia creada
 UI --> Estudiante: Muestra nombre y características de la materia creada
 
 
-
+@enduml
 
 
 
