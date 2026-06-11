@@ -19,7 +19,9 @@ Estudiante -> UI: Selecciona materia existente
 
 Alt Archivo inválido
 Estudiante -> UI: Carga archivo (.pdf/.docx/.doc/.ppt)
-Estudiante -> UI: Selecciona archivo 
+Estudiante -> UI: Confirma subir archivo
+UI -> A: Solicita crear el apunte (id_materia, titulo, ruta_archivo, tipo_archivo, tamaño_bytes)
+A --> UI: Extension no válido
 UI --> Estudiante: Muestra error de archivo inválido
 UI --> Estudiante: Muestra intefaz de selección de archivo
 end

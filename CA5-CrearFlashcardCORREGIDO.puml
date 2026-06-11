@@ -25,6 +25,8 @@ A -> A: exports.crear(id_materia, titulo, ruta_archivo, tipo_archivo, tamaño_by
 A --> UI: Apunte creado (id_apunte)
 
 ' === FASE 3: Generación IA de flashcards ===
+UI --> Estudiante: Interfaz de Generar flashcards con IA
+Estudiante -> UI: Selecciona Generar flashcards con IA
 UI -> F: exports.generarYGuardar(id_apunte)
 F -> A: Solicita datos del apunte (id_apunte)
 A -> A: exports.obtenerPorId(id_apunte)
